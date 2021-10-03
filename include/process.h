@@ -5,7 +5,8 @@ typedef struct {
 	int processNumber;
 	int duration;
 	int arrival;
-	char *io;
+	char textoIO[100];
+	char **io;
 	int qtdeIO;
 } Processo;
 
