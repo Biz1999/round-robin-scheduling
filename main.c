@@ -46,6 +46,7 @@ int main()
 		pid[controlProcess].duration = atoi(result[1]);
 		pid[controlProcess].arrival = atoi(result[2]);
 		pid[controlProcess].waitingTime = 0;
+		pid[controlProcess].time = 0;
 
 		if(result[3]!= 0) {
 			strcpy(pid[controlProcess].textoIO ,result[3]);

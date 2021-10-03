@@ -8,7 +8,7 @@
 #define push(qtdNaFila, fila, processo) ((fila[qtdNaFila]) = (processo))
 
 void pop (int qtdNaFila, Processo *fila){
-	for (int i = 0; i < qtdNaFila-1; i++){
+	for (int i = 0; i < qtdNaFila; i++){
 			fila[i] = fila[i + 1];
 	}
 }
@@ -44,7 +44,7 @@ void roundRobin(Processo* processos, int numeroDeProcessos, int quantum) {
 		for (int i = 0; i < tempo; i++) {
 			for (int j = 0; j < qtdNaFila; j++) {
 				if( j==0 ){
-					fila[j].duration -= 1;
+					fila[j].time += 1;
 					quantum -= 1;
 				} else{
 					fila[j].waitingTime += 1;
@@ -52,12 +52,27 @@ void roundRobin(Processo* processos, int numeroDeProcessos, int quantum) {
 			}
 			//printf("Tempo %d - %d ", i, qtdNaFila);
 			printf("%d = %d - %d - %d - %d - %d\n", i, fila[0].processNumber,fila[1].processNumber,fila[2].processNumber, fila[3].processNumber, fila[4].processNumber);
-			if (quantum == 0){
-				printf("entrei no quantum\n");
+			printf("%d - quantidade na fila = %d\n", fila[0].time, qtdNaFila);
+			if ((fila[0].duration - fila[0].time) == 0) {
+				pop(qtdNaFila, fila);
+				qtdNaFila -= 1;
+				quantum = 4;
+			}
+			else if (quantum == 0){
 				Processo processoAtual = fila[0];
 				pop(qtdNaFila, fila);
 				push(qtdNaFila-1, fila, processoAtual);
 				quantum = 4;
+			}else{
+				for(int k=0; k<fila[0].qtdeIO; k++){
+						if(atoi(fila[0].io[k]) == fila[0].time){
+							Processo processoAtual = fila[0];
+							pop(qtdNaFila, fila);
+							push(qtdNaFila-1, fila, processoAtual);
+							quantum = 4;
+							break;
+						}
+				}
 			}
 			if (i != 0)
 				qtdNaFila = chegadaProcesso(processos, numeroDeProcessos, i,fila, qtdNaFila);

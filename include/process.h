@@ -4,6 +4,7 @@
 typedef struct {
 	int processNumber;
 	int duration;
+	int time;
 	int arrival;
 	int waitingTime;
 	char textoIO[100];
