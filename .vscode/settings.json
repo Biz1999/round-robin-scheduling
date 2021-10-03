@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "process.h": "c",
+    "string.h": "c",
+    "stdlib.h": "c"
+  }
+}
