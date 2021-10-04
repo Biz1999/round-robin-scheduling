@@ -3,112 +3,95 @@
 #include <malloc.h>
 #include <string.h>
 #include "include/process.h"
+#include "include/roundrobin.h"
 
 int main()
 {
-	int i;
-	char *str;
-	char *temp;
+	int controlProcess = 0;
+	int controlIO = 0;
 
-	str = malloc(100 * sizeof(char));
+	Processo* pid;
 
-	i = 1;
-	while(fgets(str, 100, stdin)){
-		temp = strtok(str, ";");
+	char *result_archive;
+	char str[100];
 
-		printf("Linha %d\n", i);
-		while(temp){
-			printf("%s ", temp);
-			temp = strtok(NULL, ";");
+	//Input do arquivo no nomento da compilação
+	while (fgets(str, 100, stdin)) {
+
+		int lenString = 1;
+		char** result = malloc(4 * sizeof(char**));
+
+		char linha[100];
+
+		strcpy(linha, str);
+
+		char *temp = strtok(linha, ";");
+
+		if(temp != 0) {
+			result[0] = temp;
 		}
-		printf("\n");
-		i++;
+
+		while( (temp = strtok(0, ";")) != 0) {
+			//result = realloc(result, (lenString + 1) * sizeof(char**));
+			result[lenString++] = temp;
+		}
+
+		if(controlProcess == 0) {
+		 	pid = malloc(sizeof(Processo) * (controlProcess + 1));
+		} else {
+			pid = realloc(pid, sizeof(Processo) * (controlProcess + 1));
+		}
+
+		pid[controlProcess].processNumber = atoi(result[0]);
+		pid[controlProcess].duration = atoi(result[1]);
+		pid[controlProcess].arrival = atoi(result[2]);
+		pid[controlProcess].waitingTime = 0;
+		pid[controlProcess].time = 0;
+
+		if(result[3]!= 0) {
+			strcpy(pid[controlProcess].textoIO ,result[3]);
+		} else {
+			strcpy(pid[controlProcess].textoIO ,""); 
+		}
+	
+		controlProcess++;
+		free(result);
+		free(temp);
+  }
+
+	//CORREÇÃO DO CAMPO IO
+	for(int i=0; i< controlProcess;i++) {	
+		if(pid[i].textoIO != "")
+		{	
+			char *tempIO = strtok(pid[i].textoIO , ",");
+
+			pid[i].io  = malloc(sizeof(char**));
+
+			if(tempIO == 0 ) {
+				pid[i].io[0] = 0;
+				pid[i].qtdeIO = 0;
+			} else {
+				pid[i].io[0] = (int)tempIO;
+				pid[i].qtdeIO = 1;
+			}
+
+			while( (tempIO = strtok(0, ",")) != 0) {				
+				pid[i].io = realloc(pid[i].io, (pid[i].qtdeIO + 1) * sizeof(char**));
+				pid[i].io[pid[i].qtdeIO] = (int)tempIO;
+				pid[i].qtdeIO++;
+			}
+			free(tempIO);
+		}
 	}
+	
+	//REALIZAR ALGORITMO ROUND ROBIN
 
-	free(str);
-	// int controlProcess = 0;
-	// int controlIO = 0;
+	roundRobin(pid, controlProcess, 4);
 
-	// Processo* pid;
+	//FIM DO ALGORITMO
 
-	// FILE *arq;
-	// char Linha[100];
-	// char *result_archive;
+	free(pid);
 
-	// arq = fopen("input.txt", "rt");
-
-	// if (arq == NULL)
-	// {
-	// 	printf("Problemas na abertura do arquivo\n");
-	// 	return 1;
-	// }
-
-	// while (!feof(arq))
-  // 	{
-
-	// 	int lenString = 1;
-	// 	result_archive = fgets(Linha, 100, arq); 
-	// 	char** result = malloc(sizeof(char**));
-
-	// 	char *temp = strtok(Linha, ";");
-
-	// 	if(temp != 0) {
-	// 		result[0] = temp;
-	// 	}
-
-	// 	while( (temp = strtok(0, ";")) != 0) {
-	// 		result = realloc(result, (lenString + 1) * sizeof(char**));
-	// 		result[lenString++] = temp;
-	// 	}
-
-
-	// 	if(controlProcess == 0) {
-	// 	 	pid = malloc(sizeof(Processo) * (controlProcess + 1));
-	// 	} else {
-	// 		pid = realloc(pid, sizeof(Processo) * (controlProcess + 1));
-	// 	}
-
-
-	// 	pid[controlProcess].processNumber = atoi(result[0]);
-	// 	pid[controlProcess].duration = atoi(result[1]);
-	// 	pid[controlProcess].arrival = atoi(result[2]);
-		
-	// 	char *tempIO = strtok(result[3], ",");
-
-
-
-	// 	pid[controlProcess].io  = malloc(sizeof(char**));
-
-
-	// 	if(tempIO == 0 ) {
-	// 		pid[controlProcess].io[0] = 0;
-	// 		pid[controlProcess].qtdeIO = 0;
-	// 	} else {
-	// 		pid[controlProcess].io[0] = tempIO;
-	// 		pid[controlProcess].qtdeIO = 1;
-	// 	}
-
-	// 	while( (tempIO = strtok(0, ",")) != 0) {
-	// 		pid[controlProcess].io = realloc(pid[controlProcess].io, (pid[controlProcess].qtdeIO + 1) * sizeof(char**));
-	// 		pid[controlProcess].io[pid[controlProcess].qtdeIO++] = tempIO;
-	// 	}
-
-	// 	controlProcess++;
-
-
-	// 	free(result);
-	// 	free(temp);
-
-  // 	}
-
-
-	// for(int i=0; i< controlProcess;i++) {
-	// 	printf("%d\n", pid[i].io[0]);
-	// }
-
-	// //free(pid);
-
-	// fclose(arq);
 
 	return 0;
 
